@@ -3,25 +3,14 @@ import sys
 from distutils.core import setup
 from setuptools import find_packages
 
-version = "0.2.0"
+version = "0.3.0"
 
-install_requires = [
-    "acme>=0.29.0",
-    "certbot>=1.1.0",
-    "msrestazure",
-    "azure-identity",
-    "azure-mgmt-resource",
-    "azure-mgmt-network",
-    "azure-mgmt-dns>=3.0.0",
-    "PyOpenSSL>=19.1.0",
-    "setuptools",  # pkg_resources
-    "zope.interface",
-]
-
-if sys.version_info < (2, 7):
-    install_requires.append("mock<1.1.0")
-else:
-    install_requires.append("mock")
+with open("requirements.txt") as req_file:
+    install_requires = [
+        line.strip()
+        for line in req_file
+        if line.strip() and not line.strip().startswith("#")
+    ]
 
 docs_extras = [
     "Sphinx>=1.0",  # autodoc_member_order = 'bysource', autodoc_default_flags
