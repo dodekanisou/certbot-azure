@@ -8,7 +8,7 @@ import zope.interface
 from azure.identity import ClientSecretCredential
 from azure.mgmt.dns import DnsManagementClient
 from azure.mgmt.dns.models import RecordSet, TxtRecord
-from msrestazure.azure_exceptions import CloudError
+from azure.core.exceptions import HttpResponseError
 
 
 from certbot import errors
@@ -154,7 +154,7 @@ class _AzureClient(object):
             self.dns_client.record_sets.create_or_update(
                 self.resource_group, zone, relative_record_name, "TXT", record
             )
-        except CloudError as e:
+        except HttpResponseError as e:
             logger.error("Encountered error adding TXT record: %s", e)
             raise errors.PluginError(
                 "Error communicating with the Azure DNS API: {0}".format(e)
@@ -176,7 +176,7 @@ class _AzureClient(object):
             self.dns_client.record_sets.delete(
                 self.resource_group, zone, relative_record_name, "TXT"
             )
-        except (CloudError, errors.PluginError) as e:
+        except (HttpResponseError, errors.PluginError) as e:
             logger.warning("Encountered error deleting TXT record: %s", e)
 
     def _find_managed_zone(self, domain):
@@ -197,7 +197,7 @@ class _AzureClient(object):
                 azure_zones.next()
         except StopIteration:
             pass
-        except CloudError as e:
+        except HttpResponseError as e:
             logger.error("Error finding zone: %s", e)
             raise errors.PluginError(
                 "Error finding zone form the Azure DNS API: {0}".format(e)

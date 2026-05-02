@@ -7,19 +7,19 @@ import mock
 import json
 
 from certbot import errors
-from certbot.plugins import dns_test_common_lexicon
+from certbot.plugins import dns_test_common
 from certbot.plugins.dns_test_common import DOMAIN
 from certbot.tests import util as test_util
 from requests import Response
 
-from msrestazure.azure_exceptions import CloudError
+from azure.core.exceptions import HttpResponseError
 
 
 RESOURCE_GROUP = "test-test-1"
 
 
 class AuthenticatorTest(
-    test_util.TempDirTestCase, dns_test_common_lexicon.BaseLexiconAuthenticatorTest
+    test_util.TempDirTestCase, dns_test_common.BaseAuthenticatorTest
 ):
     def setUp(self):
         from certbot_azure.dns_azure import Authenticator
@@ -39,7 +39,8 @@ class AuthenticatorTest(
         self.auth._get_azure_client = mock.MagicMock(return_value=self.mock_client)
 
     def test_perform(self):
-        self.auth.perform([self.achall])
+        with test_util.patch_display_util():
+            self.auth.perform([self.achall])
 
         expected = [
             mock.call.add_txt_record("_acme-challenge." + DOMAIN, mock.ANY, mock.ANY)
@@ -64,7 +65,7 @@ class AzureClientTest(test_util.TempDirTestCase):
     def _getCloudError(self):
         response = Response()
         response.status_code = 500
-        return CloudError(response)
+        return HttpResponseError(response=response, message="Test error")
 
     def setUp(self):
         from certbot_azure.dns_azure import _AzureClient

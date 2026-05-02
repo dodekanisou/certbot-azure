@@ -2,6 +2,7 @@
 
 from __future__ import print_function
 
+import json
 import os
 import logging
 import time
@@ -25,10 +26,10 @@ from certbot import errors
 
 from certbot.plugins import common
 
-from azure.common.client_factory import get_client_from_auth_file
+from azure.identity import ClientSecretCredential
 from azure.mgmt.resource import ResourceManagementClient
 from azure.mgmt.network import NetworkManagementClient
-from msrestazure.azure_exceptions import CloudError
+from azure.core.exceptions import HttpResponseError
 
 
 MSDOCS = "https://docs.microsoft.com/"
@@ -180,11 +181,30 @@ class _AzureClient(object):
 
     def __init__(self, resource_group, account_json=None):
         self.resource_group = resource_group
-        self.resource_client = get_client_from_auth_file(
-            ResourceManagementClient, auth_path=account_json
+        with open(account_json) as json_file:
+            json_dict = json.load(json_file)
+
+        credential = ClientSecretCredential(
+            tenant_id=json_dict["tenantId"],
+            client_id=json_dict["clientId"],
+            client_secret=json_dict["clientSecret"],
+            authority=json_dict["activeDirectoryEndpointUrl"],
         )
-        self.network_client = get_client_from_auth_file(
-            NetworkManagementClient, auth_path=account_json
+        self.resource_client = ResourceManagementClient(
+            credential,
+            json_dict["subscriptionId"],
+            base_url=json_dict["resourceManagerEndpointUrl"],
+            credential_scopes=[
+                "{}/.default".format(json_dict["resourceManagerEndpointUrl"])
+            ],
+        )
+        self.network_client = NetworkManagementClient(
+            credential,
+            json_dict["subscriptionId"],
+            base_url=json_dict["resourceManagerEndpointUrl"],
+            credential_scopes=[
+                "{}/.default".format(json_dict["resourceManagerEndpointUrl"])
+            ],
         )
 
     def update_agw(self, agw_name, domain, key_path, fullchain_path):
@@ -214,7 +234,7 @@ class _AzureClient(object):
             self.network_client.application_gateways.create_or_update(
                 self.resource_group, agw_name, agw
             )
-        except CloudError as e:
+        except HttpResponseError as e:
             logger.warning("Encountered error updating app gateway: %s", e)
             raise errors.PluginError(
                 "Error communicating with the Azure API: {0}".format(e)

@@ -1,0 +1,14 @@
+certbot
+azure-identity
+azure-mgmt-network
+azure-mgmt-resource
+azure-mgmt-dns
+configobj
+coverage
+cryptography
+mock
+pytest
+PyOpenSSL
+zope.component
+zope.event
+zope.interface

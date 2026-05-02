@@ -6,6 +6,10 @@ Use the certbot client to generate and install certificates in Azure.
 
 Currently it supports authentication with Azure DNS and installation to Azure App Gateway.
 
+## Fork modifications
+
+Replaced legacy authentication with azure-identity following the [official migration guide](https://github.com/Azure/azure-sdk-for-python/blob/main/sdk/identity/azure-identity/migration_guide.md), removed unused dependencies, and refreshed all remaining packages using `uv pip compile requirements.in -o requirements.txt`. Updated the test suite accordingly and preserved support for JSON‑file–based authentication.
+
 ### Before you start
 
 Before starting you need:

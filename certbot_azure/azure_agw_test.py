@@ -10,7 +10,7 @@ from certbot import errors
 from certbot.tests import util as test_util
 from requests import Response
 
-from msrestazure.azure_exceptions import CloudError
+from azure.core.exceptions import HttpResponseError
 from azure.mgmt.network.models import ApplicationGateway
 from azure.mgmt.network.models import ApplicationGatewaySslCertificate
 
@@ -27,7 +27,7 @@ class AzureClientTest(test_util.TempDirTestCase):
     def _getCloudError(self):
         response = Response()
         response.status_code = 500
-        return CloudError(response)
+        return HttpResponseError(response=response, message="Test error")
 
     def _generate_dummy_agw(self):
         agw = ApplicationGateway()
