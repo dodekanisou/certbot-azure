@@ -27,10 +27,15 @@ The easiest way to install both the certbot client and the certbot-azure plugin 
   If you are in Ubuntu you will need to install `pip` and other libraries:
 
   ```bash
-  apt-get install python-pip python-dev libffi-dev libssl-dev libxml2-dev libxslt1-dev libjpeg8-dev zlib1g-dev dialog
+  apt-get install python3-pip python3-dev python-is-python3 python3-venv libffi-dev libssl-dev libxml2-dev libxslt1-dev libjpeg8-dev zlib1g-dev dialog
   ```
 
-  And then run `pip install certbot-azure`.
+  And then run 
+  ```bash
+  python -m venv .venv
+  source .venv/bin/activate
+  pip install certbot-azure
+  ```
 
 
 ### Obtaining a certificate with Azure DNS authentication
