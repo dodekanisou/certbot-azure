@@ -80,9 +80,11 @@ pycparser==3.0
     # via cffi
 pygments==2.20.0
     # via pytest
-pyjwt==2.12.1
-    # via msal
-pyopenssl==26.1.0
+pyjwt[crypto]==2.12.1
+    # via
+    #   msal
+    #   pyjwt
+pyopenssl==26.2.0
     # via
     #   -r requirements.in
     #   acme
