@@ -106,7 +106,7 @@ typing-extensions==4.15.0
     #   azure-mgmt-dns
     #   azure-mgmt-network
     #   azure-mgmt-resource
-urllib3==2.6.3
+urllib3==2.7.0
     # via requests
 zope-component==7.1
     # via -r requirements.in
